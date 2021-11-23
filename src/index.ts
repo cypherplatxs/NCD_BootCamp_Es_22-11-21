@@ -3,22 +3,31 @@ import {
 	projectsForVoting,
 	projectsForFinancing,
 	projectsReached,
-	Project, Status
+	Project,
+	Status
 } from "./models";
 
+/*
+* setters
+*/
 export function createProject(
 	title: string,
 	description: string,
+	fundingGoal: i32,
+	owner: string
 ): void {
-	// TODO: make better verifications
+	// TODO: make better validations
 	assert(title.length > 0, "debes incluir un titulo")
 	assert(description.length > 0 && description.length < 50, 'Incluye una descripcion corta')
 
 	projectsForVoting.push(
-		new Project(Project.length, title, description)
+		new Project(Project.length, title, description, fundingGoal, owner)
 	);
 }
 
+/*
+* getters
+*/
 export function getAllProjectsForVoting(): Array<Project> {
 	const arr = projectsForVoting
 	const length = arr.length
@@ -49,25 +58,44 @@ export function getAllProjectsReached(): Array<Project> {
 	return result;
 }
 
-export function avalProject(
+/*
+* mutators
+*/
+export function voteProject(
 	id: i32,
-	amount: i32,
 ): Project {
-	assert(<i32>amount > 0, "debes incluir al menos 1 near")
-	let project = Project[id]
-	project.avalCount += amount
-	Project.replace(<i32>id, project)
+	//TODO: avoid vote duplication usign map
+	let project = projectsForVoting[id]
+	project.voters.push(Context.sender)
+	project.votes += 1
+	if (project.votes >= 100) {
+		project.status = Status.financing
+		projectsForVoting.swap_remove(<i32>id)
+		// TODO replace array w/ map
+		projectsForFinancing.push(project)
+		return project
+	}
+	projectsForVoting.replace(<i32>id, project)
 	return project
 }
 
-export function changeStatus(id: i32): Project {
-	let project = Project[id]
-	project.status = Status.goal_reached
-	Project.replace(<i32>id, project)
+export function fundProject(
+	id: i32,
+	amount: i32
+): Project {
+	//TODO: avoid vote duplication usign map
+	let project = projectsForFinancing[id]
+	// TODO: support funds transfer
+	project.funds += amount
+	if (project.funds >= project.fundingGoal) {
+		project.status = Status.reached
+		projectsForFinancing.swap_remove(<i32>id)
+		// TODO replace array w/ map
+		projectsReached.push(project)
+		return project
+	}
+	projectsForFinancing.replace(<i32>id, project)
 	return project
 }
 
-export function eliminateProject(id: i32): void {
-	assert(id >= 0, "No tenemos contratos con id negativos")
-	Project.swap_remove(<i32>id)
-}
+// TODO: support funds withdraw
