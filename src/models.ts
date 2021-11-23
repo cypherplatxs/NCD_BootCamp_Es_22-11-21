@@ -1,18 +1,22 @@
 import { PersistentVector } from "near-sdk-core";
 
 export enum Status {
-	growing,
-	goal_reached,
+	voting,
+	rejected,
+	approved,
+	financing,
+	reached
 }
 
 
 @nearBindgen
-export class ProjectsForAval {
+export class Project {
 	id: u64
 	title: string;
 	description: string;
 	status: Status;
-	avalCount: u64;
+	votes: u64;
+	voters: Array<string>
 
 	constructor(
 		id: u64,
@@ -24,10 +28,13 @@ export class ProjectsForAval {
 		this.description = description;
 		this.status = Status.growing;
 		this.avalCount = 0;
+		this.voters = new Array()
 	}
 }
 
 
 
 /* STORAGE */
-export let projects = new PersistentVector<ProjectsForAval>("project")
+export let projectsForVoting = new PersistentVector<Project>("projectsForVoting")
+export let projectsForFinancing = new PersistentVector<Project>("projectsForFinancing")
+export let projectsReached = new PersistentVector<Project>("projectsReached")
