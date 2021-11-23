@@ -2,7 +2,6 @@
 	"name": "plato-minga",
 	"version": "1.0.0",
 	"description": "fork de aval comunitario",
-	"main": "index.js",
 	"scripts": {
 		"test": "asp",
 		"build": "asb",
