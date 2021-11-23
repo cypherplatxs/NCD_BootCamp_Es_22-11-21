@@ -1,2 +1,15 @@
-# NCD_BootCamp_Es_22-11-21
-Propuesta para el proceso de certificación Near 
+# Equipo 4 
+
+## BootCamp Es 22 11 21 
+
+# titulo del proyecto 
+
+Acá iriá la descriṕción del proyecto 
+
+
+## Cómo lo hicimos 
+
+
+A partir del codígo del pryecto mingadao 
+
+
