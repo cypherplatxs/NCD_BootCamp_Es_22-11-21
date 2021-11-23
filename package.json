@@ -1,0 +1,15 @@
+{
+	"name": "plato-minga",
+	"version": "1.0.0",
+	"description": "fork de aval comunitario",
+	"scripts": {
+		"test": "asp",
+		"build": "asb",
+		"deploy:dev": "yarn build && near dev-deploy"
+	},
+	"author": "equipo-4-cypherplatxs",
+	"license": "MIT",
+	"devDependencies": {
+		"near-sdk-as": "^3.2.3"
+	}
+}
