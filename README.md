@@ -11,7 +11,7 @@ Se le adhiere la posibilidad de que los proyectos que se han votado positivo pas
 
       Crear un proyecto.
       Obtener una lista de los proyectos que se han creado.
-      Avalar un proyecto.
+      Votar un proyecto.
       Finaciar de proyectos.
       Memoria-Obtener una lista de los de proyecto realizados.
 
