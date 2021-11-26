@@ -9,7 +9,7 @@ export enum Status {
 
 @nearBindgen
 export class Project {
-	id: u64
+	id: i32;
 	title: string;
 	description: string;
 	status: Status;
