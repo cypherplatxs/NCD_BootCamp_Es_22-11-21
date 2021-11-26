@@ -1,4 +1,4 @@
-import { Context } from "near-sdk-as";
+import { Context, PersistentMap } from "near-sdk-as";
 import {
 	projectsForVoting,
 	projectsForFinancing,
@@ -6,6 +6,13 @@ import {
 	Project,
 	Status
 } from "./models";
+
+/*
+* Helpers
+*/
+function getNewProjectId(blockNumber: u64, owner: string): string {
+	return blockNumber.toString().concat("@").concat(owner)
+}
 
 /*
 * setters
@@ -19,82 +26,89 @@ export function createProject(
 	// TODO: make better validations
 	assert(title.length > 0, "debes incluir un titulo")
 	assert(description.length > 0 && description.length < 50, 'Incluye una descripcion corta')
-
-	projectsForVoting.push(
-		new Project(projectsForVoting.length, title, description, fundingGoal, owner)
+	let projectId = getNewProjectId(Context.blockIndex, owner)
+	projectsForVoting.set(
+		projectId,
+		new Project(projectId, title, description, fundingGoal, owner)
 	);
 }
 
 /*
 * getters
 */
-export function getAllProjectsForVoting(): Array<Project> {
-	const arr = projectsForVoting
-	const length = arr.length
-	const result = new Array<Project>(length);
-	for (let i = 0; i < length; i++) {
-		result[i] = arr[i];
-	}
-	return result;
+export function getAllProjectsForVoting(): PersistentMap<string, Project> {
+	// const arr = projectsForVoting
+	// const length = arr.length
+	// const result = new Array<Project>(length);
+	// for (let i = 0; i < length; i++) {
+	// 	result[i] = arr[i];
+	// }
+	return projectsForVoting;
 }
 
-export function getAllProjectsForFinancing(): Array<Project> {
-	const arr = projectsForFinancing
-	const length = arr.length
-	const result = new Array<Project>(length);
-	for (let i = 0; i < projectsForFinancing.length; i++) {
-		result[i] = arr[i];
-	}
-	return result;
+export function getAllProjectsForFinancing(): PersistentMap<string, Project> {
+	// const arr = projectsForFinancing
+	// const length = arr.length
+	// const result = new Array<Project>(length);
+	// for (let i = 0; i < projectsForFinancing.length; i++) {
+	// 	result[i] = arr[i];
+	// }
+	return projectsForFinancing;
 }
 
-export function getAllProjectsReached(): Array<Project> {
-	const arr = projectsReached
-	const length = arr.length
-	const result = new Array<Project>(length);
-	for (let i = 0; i < length; i++) {
-		result[i] = arr[i];
-	}
-	return result;
+export function getAllProjectsReached(): PersistentMap<string, Project> {
+	// const arr = projectsReached
+	// const length = arr.length
+	// const result = new Array<Project>(length);
+	// for (let i = 0; i < length; i++) {
+	// 	result[i] = arr[i];
+	// }
+	return projectsReached;
 }
 
 /*
 * mutators
 */
 export function voteProject(
-	id: i32,
-): Project {
+	id: string,
+): Project | null {
 	//TODO: avoid vote duplication usign map
-	let project = projectsForVoting[id]
+	let project = projectsForVoting.get(id)
+	if (!project) {
+		return null
+	}
 	project.voters.push(Context.sender)
 	project.votes += 1
 	if (project.votes >= 100) {
 		project.status = Status.financing
-		projectsForVoting.swap_remove(<i32>id)
+		projectsForVoting.delete(id)
 		// TODO replace array w/ map
-		projectsForFinancing.push(project)
+		projectsForFinancing.set(project.id, project)
 		return project
 	}
-	projectsForVoting.replace(<i32>id, project)
+	projectsForVoting.set(id, project)
 	return project
 }
 
 export function fundProject(
-	id: i32,
+	id: string,
 	amount: i32
-): Project {
+): Project | null {
 	//TODO: avoid vote duplication usign map
-	let project = projectsForFinancing[id]
+	let project = projectsForFinancing.get(id)
+	if (!project) {
+		return null
+	}
 	// TODO: support funds transfer
 	project.funds += amount
 	if (project.funds >= project.fundingGoal) {
 		project.status = Status.reached
-		projectsForFinancing.swap_remove(<i32>id)
+		projectsForFinancing.delete(id)
 		// TODO replace array w/ map
-		projectsReached.push(project)
+		projectsReached.set(project.id, project)
 		return project
 	}
-	projectsForFinancing.replace(<i32>id, project)
+	projectsForFinancing.set(project.id, project)
 	return project
 }
 
