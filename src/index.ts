@@ -21,7 +21,7 @@ export function createProject(
 	assert(description.length > 0 && description.length < 50, 'Incluye una descripcion corta')
 
 	projectsForVoting.push(
-		new Project(Project.length, title, description, fundingGoal, owner)
+		new Project(projectsForVoting.length, title, description, fundingGoal, owner)
 	);
 }
 
