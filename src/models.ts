@@ -43,6 +43,5 @@ export class Project {
 
 /* STORAGE */
 export let projectsForVoting = new PersistentMap<string, Project>("projectsForVoting")
-export let projectsForVoting = new PersistentMap<string, Project>("projectsForVoting")
 export let projectsForFinancing = new PersistentMap<string, Project>("projectsForFinancing")
 export let projectsReached = new PersistentMap<string, Project>("projectsReached")
